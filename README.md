@@ -63,3 +63,29 @@ Now, most shells has `[` as a shell built-in command
 
 **Resources:**
 - `man 1 test`
+
+## 0X03 - Linux boot by Microsoft Corp.
+
+ELF is the format for everything in Linux - also the kernel
+
+Right?
+
+![](images/03-1.png)
+
+WTF, why does my kernel have MZ and PE headers?
+
+![](images/03-2.png)
+
+UEFI is the modern replacement for the old BIOS firmware
+
+It uses PE file format to load bootloaders and operating systems
+
+To support booting on UEFI systems, the Linux kernel is wrapped inside a PE container
+
+This wrapping lets UEFI firmware load the kernel as a normal EFI executable
+
+The actual Linux kernel is still an ELF binary inside this PE wrapper
+
+On BIOS systems, bootloaders ignore the PE wrapper and directly load the compressed ELF kernel - this design allows a single kernel image to boot on both BIOS and UEFI platforms without modification
+
+You could make your kernel supports UEFI booting in build time - `CONFIG_EFI.*`
