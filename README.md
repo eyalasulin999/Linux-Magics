@@ -64,7 +64,7 @@ Now, most shells has `[` as a shell built-in command
 **Resources:**
 - `man 1 test`
 
-## 0X03 - Linux boot by Microsoft Corp.
+## 0x03 - Linux boot by Microsoft Corp.
 
 ELF is the format for everything in Linux - also the kernel
 
@@ -89,3 +89,52 @@ The actual Linux kernel is still an ELF binary inside this PE wrapper
 On BIOS systems, bootloaders ignore the PE wrapper and directly load the compressed ELF kernel - this design allows a single kernel image to boot on both BIOS and UEFI platforms without modification
 
 You could make your kernel supports UEFI booting in build time - `CONFIG_EFI.*`
+
+## 0x04 - Invisible Threads
+
+Let's list some running threads
+
+![](images/04-1.png)
+
+Let's pick the first one - PID is 860, and LWP (lightweight process, aka TID) is 929
+
+We could list and access threads of a process under `/proc/<PID>/task`
+
+![](images/04-2.png)
+
+In Linux, a thread is actually a process - threads and processes are both implemented as `tasks` in the kernel. A thread is created using `clone()` with flags that tell it to share certain things with its parent
+
+So, we could find our TID under `/proc` right?
+
+![](images/04-3.png)
+
+:(
+
+![](images/04-4.png)
+
+WTF
+
+Why does the thread's directory isn't shown when ls `/proc` directory?
+
+They are hidden from directory listings
+
+- `/proc` was designed to show processes - threads are considered part of a single process
+- If every thread appeared as a process in `/proc`, the directory would be flooded with thousands of entries, making it harder to navigate or parse
+
+So, why threads can be accessed directly by `/proc/<TID>`?
+
+As we explaind above - a thread is actually a process, lightweight process
+
+`task_struct` - `pid` is the task id, `tgid` is the thread group id
+
+Main thread - pid == tgid
+
+![](images/04-6.png)
+
+So, PID (aka main thread id) and TID uses the same identifier field -> `/proc/<PID>` is the same as `/proc/<TID>`
+
+![](images/04-5.png)
+
+**Resources:**
+- `man 5 proc`
+- https://elixir.bootlin.com/linux/v6.15.8/source/include/linux/sched.h#L813
