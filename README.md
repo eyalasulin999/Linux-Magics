@@ -138,3 +138,19 @@ So, PID (aka main thread id) and TID uses the same identifier field -> `/proc/<P
 **Resources:**
 - `man 5 proc`
 - https://elixir.bootlin.com/linux/v6.15.8/source/include/linux/sched.h#L813
+
+## 0x05 - Delete a file without permissions
+
+Let's create a file and set no permissions at all
+
+![](images/05-1.png)
+
+Great
+
+Would it work to delete the file? we have no permissions
+
+![](images/05-2.png)
+
+WTF, why could we delete the file without any permissions?
+
+File deletion depends on the permissions of the directory containing the file, not the file itself
