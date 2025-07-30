@@ -154,3 +154,39 @@ Would it work to delete the file? we have no permissions
 WTF, why could we delete the file without any permissions?
 
 File deletion depends on the permissions of the directory containing the file, not the file itself
+
+## 0x06 - User permissions > Group permissions
+
+Let's create a new user named `sarit`, and a group named `hadad` - `sarit` is a member of `hadad`
+
+![](images/06-1.png)
+
+Now create a file with owner user `sarit` and owner group `hadad`
+
+![](images/06-2.png)
+
+Let's remove permissions for the user
+
+![](images/06-3.png)
+
+Would it work to read the file?
+
+`sarit` is a member of `hadad`, it sohuld work
+
+![](images/06-4.png)
+
+WTF
+
+Only the owner permissions applied, not the group permissions — even if `sarit` is a member of `hadad`
+
+The kernel checks in this order:
+
+1. If the process's effective UID matches the file's owner UID, then the file owner’s permissions apply.
+
+2. Else, if the process’s group matches the file group, then the group permissions apply.
+
+3. Otherwise, the "other" permissions apply.
+
+**Resources**:
+- `man 5 acl` (ACCESS CHECK ALGORITHM)
+- https://elixir.bootlin.com/linux/v6.13/source/fs/namei.c
